@@ -1,0 +1,74 @@
+{
+  "timestamp": "2025-10-27T16:57:38.814124",
+  "total_tests": 13,
+  "passed_tests": 13,
+  "success_rate": 100.0,
+  "all_passed": true,
+  "detailed_results": [
+    {
+      "test": "User Registration",
+      "status": "PASSED",
+      "details": ""
+    },
+    {
+      "test": "User Registration for Login Test",
+      "status": "PASSED",
+      "details": ""
+    },
+    {
+      "test": "User Login",
+      "status": "PASSED",
+      "details": ""
+    },
+    {
+      "test": "Get User Profile",
+      "status": "PASSED",
+      "details": ""
+    },
+    {
+      "test": "Add Expense with AI Categorization",
+      "status": "PASSED",
+      "details": ""
+    },
+    {
+      "test": "Add Expense with Manual Category",
+      "status": "PASSED",
+      "details": ""
+    },
+    {
+      "test": "Get All Expenses",
+      "status": "PASSED",
+      "details": ""
+    },
+    {
+      "test": "Delete Expense",
+      "status": "PASSED",
+      "details": ""
+    },
+    {
+      "test": "Set Budget",
+      "status": "PASSED",
+      "details": ""
+    },
+    {
+      "test": "Get All Budgets",
+      "status": "PASSED",
+      "details": ""
+    },
+    {
+      "test": "Get Dashboard Stats",
+      "status": "PASSED",
+      "details": ""
+    },
+    {
+      "test": "Get AI Financial Advice",
+      "status": "PASSED",
+      "details": ""
+    },
+    {
+      "test": "Get AI Insights History",
+      "status": "PASSED",
+      "details": ""
+    }
+  ]
+}
