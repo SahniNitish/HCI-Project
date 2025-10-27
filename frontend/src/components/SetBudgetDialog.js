@@ -104,9 +104,9 @@ export default function SetBudgetDialog({ open, onClose, onSuccess }) {
                 <SelectTrigger data-testid="budget-month-select">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper" sideOffset={5}>
                   {[...Array(12)].map((_, i) => (
-                    <SelectItem key={i + 1} value={(i + 1).toString()}>
+                    <SelectItem key={i + 1} value={(i + 1).toString()} data-testid={`month-${i + 1}`}>
                       {new Date(2000, i).toLocaleString('default', { month: 'long' })}
                     </SelectItem>
                   ))}
