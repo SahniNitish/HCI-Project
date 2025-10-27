@@ -118,13 +118,14 @@ export default function AddExpenseDialog({ open, onClose, onSuccess }) {
               <Select
                 value={formData.category}
                 onValueChange={(value) => setFormData({ ...formData, category: value })}
+                required={!useAI}
               >
                 <SelectTrigger data-testid="expense-category-select">
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper" sideOffset={5}>
                   {CATEGORIES.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
+                    <SelectItem key={cat} value={cat} data-testid={`expense-category-${cat}`}>
                       {cat}
                     </SelectItem>
                   ))}
