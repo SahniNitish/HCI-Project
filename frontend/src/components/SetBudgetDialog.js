@@ -70,9 +70,9 @@ export default function SetBudgetDialog({ open, onClose, onSuccess }) {
               <SelectTrigger data-testid="budget-category-select">
                 <SelectValue placeholder="Select a category" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent position="popper" sideOffset={5}>
                 {CATEGORIES.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
+                  <SelectItem key={cat} value={cat} data-testid={`budget-category-${cat}`}>
                     {cat}
                   </SelectItem>
                 ))}
