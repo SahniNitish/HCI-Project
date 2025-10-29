@@ -12,8 +12,23 @@ import uuid
 from datetime import datetime, timezone, timedelta
 from passlib.context import CryptContext
 import jwt
-from emergentintegrations.llm.chat import LlmChat, UserMessage
 import json
+
+# Try to import emergentintegrations, use mock if not available
+try:
+    from emergentintegrations.llm.chat import LlmChat, UserMessage
+except ImportError:
+    # Mock classes for when emergentintegrations is not available
+    class UserMessage:
+        def __init__(self, text: str):
+            self.text = text
+
+    class LlmChat:
+        def __init__(self, **kwargs):
+            pass
+
+        async def run_astream(self, message):
+            yield {"type": "text", "text": "Other"}
 
 ROOT_DIR = Path(__file__).parent
 # Load .env only if it exists (for local development)
@@ -433,3 +448,7 @@ logger = logging.getLogger(__name__)
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
+
+# Vercel serverless handler using Mangum
+from mangum import Mangum
+handler = Mangum(app, lifespan="off")
