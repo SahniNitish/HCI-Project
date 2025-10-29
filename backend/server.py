@@ -16,12 +16,19 @@ from emergentintegrations.llm.chat import LlmChat, UserMessage
 import json
 
 ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
+# Load .env only if it exists (for local development)
+env_file = ROOT_DIR / '.env'
+if env_file.exists():
+    load_dotenv(env_file)
 
 # MongoDB connection
-mongo_url = os.environ['MONGO_URL']
+mongo_url = os.environ.get('MONGO_URL')
+if not mongo_url:
+    raise RuntimeError("MONGO_URL environment variable is not set")
+
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+db_name = os.environ.get('DB_NAME', 'expense_tracker_db')
+db = client[db_name]
 
 # Security
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
