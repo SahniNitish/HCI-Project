@@ -14,21 +14,8 @@ from passlib.context import CryptContext
 import jwt
 import json
 
-# Try to import emergentintegrations, use mock if not available
-try:
-    from emergentintegrations.llm.chat import LlmChat, UserMessage
-except ImportError:
-    # Mock classes for when emergentintegrations is not available
-    class UserMessage:
-        def __init__(self, text: str):
-            self.text = text
-
-    class LlmChat:
-        def __init__(self, **kwargs):
-            pass
-
-        async def run_astream(self, message):
-            yield {"type": "text", "text": "Other"}
+# Import Anthropic client
+from anthropic import Anthropic
 
 ROOT_DIR = Path(__file__).parent
 # Load .env only if it exists (for local development)
@@ -153,17 +140,30 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
 async def categorize_expense_with_ai(description: str, amount: float) -> str:
     """Use AI to categorize expense based on description and amount"""
     try:
-        llm_key = os.environ.get('EMERGENT_LLM_KEY')
-        chat = LlmChat(
-            api_key=llm_key,
-            session_id="expense_categorization",
-            system_message="You are an expense categorization assistant. Categorize expenses into one of these categories ONLY: Food, Transportation, Shopping, Entertainment, Bills, Healthcare, Education, Other. Return only the category name, nothing else."
-        ).with_model("openai", "gpt-4o")
+        anthropic_key = os.environ.get('ANTHROPIC_API_KEY')
+        client = Anthropic(api_key=anthropic_key)
         
-        message = UserMessage(text=f"Categorize this expense: '{description}' (Amount: ${amount})")
-        response = await chat.send_message(message)
+        system_prompt = """You are an expense categorization assistant. Categorize expenses into one of these categories ONLY: Food, Transportation, Shopping, Entertainment, Bills, Healthcare, Education, Other. 
+
+Examples:
+- DoorDash, UberEats, restaurants, groceries, coffee → Food
+- Uber, Lyft, gas, parking → Transportation
+- Amazon, Target, clothes → Shopping
+- Movies, games, streaming → Entertainment
+- Rent, utilities, phone → Bills
+
+Return only the category name, nothing else."""
         
-        category = response.strip()
+        response = client.messages.create(
+            model="claude-3-haiku-20240307",
+            max_tokens=50,
+            system=system_prompt,
+            messages=[
+                {"role": "user", "content": f"Categorize this expense: '{description}' (Amount: ${amount})"}
+            ]
+        )
+        
+        category = response.content[0].text.strip()
         valid_categories = ["Food", "Transportation", "Shopping", "Entertainment", "Bills", "Healthcare", "Education", "Other"]
         
         if category in valid_categories:
@@ -202,17 +202,21 @@ async def generate_financial_advice(user_id: str) -> str:
 - Budgets: {json.dumps([{'category': b['category'], 'limit': b['limit']} for b in budgets], indent=2)}
 """
         
-        llm_key = os.environ.get('EMERGENT_LLM_KEY')
-        chat = LlmChat(
-            api_key=llm_key,
-            session_id=f"financial_advisor_{user_id}",
-            system_message="You are a personal financial advisor. Analyze the user's spending patterns and provide 3-4 actionable, personalized savings tips. Be encouraging and specific. Format your response as a list of tips."
-        ).with_model("openai", "gpt-4o")
+        anthropic_key = os.environ.get('ANTHROPIC_API_KEY')
+        client = Anthropic(api_key=anthropic_key)
         
-        message = UserMessage(text=context)
-        response = await chat.send_message(message)
+        system_prompt = "You are a funny financial advisor who gives short, witty advice. Analyze spending patterns and give 2-3 funny but helpful savings tips. Keep it brief and entertaining. Use emojis and be a bit sarcastic but encouraging."
         
-        return response
+        response = client.messages.create(
+            model="claude-3-haiku-20240307",
+            max_tokens=200,
+            system=system_prompt,
+            messages=[
+                {"role": "user", "content": context}
+            ]
+        )
+        
+        return response.content[0].text
     except Exception as e:
         logging.error(f"Financial advice generation failed: {e}")
         return "Unable to generate advice at this time. Please try again later."
